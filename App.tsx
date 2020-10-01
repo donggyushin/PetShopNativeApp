@@ -8,13 +8,18 @@
  * @format
  */
 
+import React, {useEffect} from 'react';
 import {SafeAreaView, StatusBar, Text} from 'react-native';
 
-import React from 'react';
+import RNBootSplash from 'react-native-bootsplash';
 
 declare const global: {HermesInternal: null | {}};
 
 const App = () => {
+  useEffect(() => {
+    RNBootSplash.hide({duration: 500});
+  }, []);
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
