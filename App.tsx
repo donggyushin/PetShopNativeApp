@@ -8,8 +8,9 @@
  * @format
  */
 
+import {SafeAreaView, StatusBar, Text} from 'react-native';
+
 import React from 'react';
-import {SafeAreaView, Text, StatusBar} from 'react-native';
 
 declare const global: {HermesInternal: null | {}};
 
