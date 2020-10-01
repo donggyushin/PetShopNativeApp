@@ -8,7 +8,7 @@
  * @format
  */
 
-import {Appearance, SafeAreaView, StatusBar, Text} from 'react-native';
+import {Appearance, StatusBar} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {darkTheme, lightTheme} from './src/styles/theme';
 import styled, {ThemeProvider} from 'styled-components/native';
