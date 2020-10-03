@@ -3,11 +3,13 @@ import IntroCarouselComponent, {
   Intro,
 } from '../../components/IntroCarouselComponent';
 import React, {useEffect, useState} from 'react';
+import {StyledThemeProps, darkTheme, lightTheme} from '../../styles/theme';
 
 import Constants from '../../constants/Constants';
-import {StyledThemeProps} from '../../styles/theme';
+import {StoreType} from '../../store';
 import {View} from 'react-native';
 import styled from 'styled-components/native';
+import {useSelector} from 'react-redux';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -69,17 +71,27 @@ const PaginationComponent: React.FunctionComponent<PaginationProps> = ({
   entries,
   activeSlide,
 }) => {
+  const themeReducer = useSelector((state: StoreType) => state.ThemeReducer);
+
   return (
     <Pagination
       dotsLength={entries.length}
       activeDotIndex={activeSlide}
-      containerStyle={{backgroundColor: 'rgba(0, 0, 0, 0.75)'}}
+      containerStyle={{
+        backgroundColor:
+          themeReducer.theme === 'dark'
+            ? darkTheme.PRIMARY_BACKGROUND_COLOR
+            : lightTheme.PRIMARY_BACKGROUND_COLOR,
+      }}
       dotStyle={{
         width: 6,
         height: 6,
         borderRadius: 3,
         marginHorizontal: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        backgroundColor:
+          themeReducer.theme === 'dark'
+            ? darkTheme.PRIMARY_TEXT_COLOR
+            : lightTheme.PRIMARY_TEXT_COLOR,
       }}
       inactiveDotStyle={
         {
@@ -99,30 +111,6 @@ const IntroScreen = () => {
   useEffect(() => {
     setEntries(IntroCarouselDatas);
   }, []);
-
-  const pagination = () => {
-    return (
-      <Pagination
-        dotsLength={entries.length}
-        activeDotIndex={activeSlide}
-        containerStyle={{backgroundColor: 'rgba(0, 0, 0, 0.75)'}}
-        dotStyle={{
-          width: 10,
-          height: 10,
-          borderRadius: 5,
-          marginHorizontal: 8,
-          backgroundColor: 'rgba(255, 255, 255, 0.92)',
-        }}
-        inactiveDotStyle={
-          {
-            // Define styles for inactive dots here
-          }
-        }
-        inactiveDotOpacity={0.4}
-        inactiveDotScale={0.6}
-      />
-    );
-  };
 
   const login = () => {
     console.log('로그인 버튼 클릭');
