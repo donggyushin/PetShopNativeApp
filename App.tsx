@@ -25,6 +25,7 @@ import RNBootSplash from 'react-native-bootsplash';
 import {ThemeProvider} from 'styled-components/native';
 import {ThemeType} from './src/types/Types';
 import {eventEmitter} from 'react-native-dark-mode';
+import {themeUpdate} from './src/actions/ThemeActions';
 
 declare const global: {HermesInternal: null | {}};
 
@@ -32,41 +33,31 @@ const AppContainer = () => {
   const [themeState, setThemeState] = useState<ThemeType>('dark');
 
   useEffect(() => {
-    // debugger 를 활성화시키면 항상 light 만 반환시킨다. 다크모드로 개발중일때에는 밑에 코드를 주석처리 해주자
-    // if (Appearance.getColorScheme() === 'dark') {
-    //   setThemeState('dark');
-    // } else {
-    //   setThemeState('light');
-    // }
-
-    eventEmitter.on('currentModeChanged', (newMode) => {
-      console.log(`Switched to ${newMode} mode`);
-      if (newMode === 'dark') {
-        setThemeState('dark');
-      } else {
-        setThemeState('light');
-      }
-    });
+    // 앱이 처음 실행될때 디바이스가 화이트 모드인지 다크 모드인지 확인하는 코드.
+    // default 는 다크모드이다.
+    // setThemeState(Appearance.getColorScheme() || 'dark');
   }, []);
 
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <ThemeProvider theme={themeState === 'dark' ? darkTheme : lightTheme}>
-          <StatusBar
-            barStyle={themeState === 'dark' ? 'light-content' : 'dark-content'}
-          />
-          <App />
-        </ThemeProvider>
+        <App themeState={themeState} />
       </NavigationContainer>
     </Provider>
   );
 };
 
-const App = () => {
+interface Props {
+  themeState: ThemeType;
+}
+
+const App: React.FunctionComponent<Props> = ({themeState}) => {
   const authReducer = useSelector((state: StoreType) => state.AuthReducer);
+  const themeReducer = useSelector((state: StoreType) => state.ThemeReducer);
   const dispatch = useDispatch();
 
+  // 앱이 처음 실행될때 수행하는 동작들.
+  // 현재까지는 로그인 여부만 비동기로 판별한다
   const init = async () => {
     const token = await AsyncStorage.getItem('token');
 
@@ -78,16 +69,29 @@ const App = () => {
   };
 
   useEffect(() => {
+    dispatch(themeUpdate(themeState));
+
+    // 디바이스의 테마가 바뀌면 theme reducer의 테마를 바꾸어준다.
+    eventEmitter.on('currentModeChanged', (newMode) => {
+      dispatch(themeUpdate(newMode));
+    });
+
     init().then(() => {
-      RNBootSplash.hide({duration: 500});
+      RNBootSplash.hide({duration: 1000});
     });
   }, []);
 
-  if (authReducer.loggedIn) {
-    return <MainScreen />;
-  } else {
-    return <PublicNavigation />;
-  }
+  return (
+    <ThemeProvider
+      theme={themeReducer.theme === 'dark' ? darkTheme : lightTheme}>
+      <StatusBar
+        barStyle={
+          themeReducer.theme === 'dark' ? 'light-content' : 'dark-content'
+        }
+      />
+      {authReducer.loggedIn ? <MainScreen /> : <PublicNavigation />}
+    </ThemeProvider>
+  );
 };
 
 export default AppContainer;
