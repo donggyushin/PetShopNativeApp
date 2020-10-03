@@ -9,10 +9,14 @@
  */
 
 import {Appearance, StatusBar} from 'react-native';
+import {Provider, useDispatch, useSelector} from 'react-redux';
 import React, {useEffect, useState} from 'react';
+import {authLoggedInFalse, authLoggedInTrue} from './src/actions/AuthActions';
 import {darkTheme, lightTheme} from './src/styles/theme';
+import store, {StoreType} from './src/store';
 import styled, {ThemeProvider} from 'styled-components/native';
 
+import AsyncStorage from '@react-native-community/async-storage';
 import RNBootSplash from 'react-native-bootsplash';
 import {ThemeType} from './src/types/Types';
 import {eventEmitter} from 'react-native-dark-mode';
@@ -39,17 +43,36 @@ const Title = styled.Text`
 
 declare const global: {HermesInternal: null | {}};
 
+const AppContainer = () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
 const App = () => {
-  const [themeState, setThemeState] = useState<ThemeType>('light');
+  const [themeState, setThemeState] = useState<ThemeType>('dark');
+  const authReducer = useSelector((state: StoreType) => state.AuthReducer);
+  const dispatch = useDispatch();
+
+  const init = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    if (token) {
+      dispatch(authLoggedInTrue());
+    } else {
+      dispatch(authLoggedInFalse());
+    }
+  };
 
   useEffect(() => {
-    RNBootSplash.hide({duration: 500});
+    console.log(Appearance.getColorScheme());
 
-    if (Appearance.getColorScheme() === 'dark') {
-      setThemeState('dark');
-    } else {
-      setThemeState('light');
-    }
+    // debugger 를 활성화시키면 항상 light 만 반환시킨다. 다크모드로 개발중일때에는 밑에 코드를 주석처리 해주자
+    // if (Appearance.getColorScheme() === 'dark') {
+    //   setThemeState('dark');
+    // } else {
+    //   setThemeState('light');
+    // }
 
     eventEmitter.on('currentModeChanged', (newMode) => {
       console.log(`Switched to ${newMode} mode`);
@@ -58,6 +81,10 @@ const App = () => {
       } else {
         setThemeState('light');
       }
+    });
+
+    init().then(() => {
+      RNBootSplash.hide({duration: 500});
     });
   }, []);
 
@@ -69,7 +96,7 @@ const App = () => {
       <ThemeProvider theme={themeState === 'dark' ? darkTheme : lightTheme}>
         <Container>
           <TextContainer>
-            <Title>Themed App with React Native & Styled Components</Title>
+            <Title>{authReducer.loggedIn ? 'logged in' : 'logged out'}</Title>
           </TextContainer>
         </Container>
       </ThemeProvider>
@@ -77,4 +104,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default AppContainer;
