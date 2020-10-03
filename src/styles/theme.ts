@@ -23,3 +23,7 @@ export const lightTheme: DefaultThemeType = {
   PRIMARY_BUTTON_COLOR: '#b9d6f3',
   SECONDARY_BUTTON_COLOR: '#a1c9f1',
 };
+
+export interface StyledThemeProps {
+  theme: DefaultThemeType;
+}
