@@ -6,6 +6,7 @@ import React, {useEffect, useState} from 'react';
 import {StyledThemeProps, darkTheme, lightTheme} from '../../styles/theme';
 
 import Constants from '../../constants/Constants';
+import {IntroScreenProps} from '../../navigations/Public/PublicOutNavigationType';
 import {StoreType} from '../../store';
 import {View} from 'react-native';
 import styled from 'styled-components/native';
@@ -151,7 +152,7 @@ const PaginationComponent: React.FunctionComponent<PaginationProps> = ({
   );
 };
 
-const IntroScreen = () => {
+const IntroScreen = ({navigation, route}: IntroScreenProps) => {
   const [entries, setEntries] = useState<Intro[]>([]);
   const [activeSlide, setActiveSlide] = useState<number>(0);
 
@@ -164,7 +165,7 @@ const IntroScreen = () => {
   };
 
   const newAccount = () => {
-    console.log('회원가입 버튼 클릭');
+    navigation.navigate('NewAccount');
   };
 
   return (
