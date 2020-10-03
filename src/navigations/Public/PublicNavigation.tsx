@@ -1,7 +1,9 @@
+import {darkTheme, lightTheme} from '../../styles/theme';
+
 import IntroScreen from '../../screens/public/IntroScreen';
 import {LoggedOutStackParamList} from './PublicOutNavigationType';
-import {NewAccountOptions} from './PublicNavigationOptions';
 import NewAccountScreen from '../../screens/public/NewAccountScreen';
+import PublichNavigationHeaderStyle from './PublicNavigationHeaderStyle';
 import React from 'react';
 import {StoreType} from '../../store';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -13,7 +15,8 @@ const PublicNavigation = () => {
   const themeReducer = useSelector((state: StoreType) => state.ThemeReducer);
 
   return (
-    <LoggedOutStack.Navigator>
+    <LoggedOutStack.Navigator
+      screenOptions={() => PublichNavigationHeaderStyle(themeReducer)}>
       <LoggedOutStack.Screen
         name={'Intro'}
         options={{headerShown: false, title: '이전'}}
@@ -21,7 +24,9 @@ const PublicNavigation = () => {
       />
       <LoggedOutStack.Screen
         name={'NewAccount'}
-        options={() => NewAccountOptions(themeReducer)}
+        options={{
+          title: '회원가입',
+        }}
         component={NewAccountScreen}
       />
     </LoggedOutStack.Navigator>

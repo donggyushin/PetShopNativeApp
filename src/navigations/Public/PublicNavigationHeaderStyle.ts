@@ -1,12 +1,12 @@
 import {darkTheme, lightTheme} from '../../styles/theme';
 
-export const NewAccountOptions = (themeReducer: any): any => ({
-  title: '회원가입',
+const PublichNavigationHeaderStyle = (themeReducer: any): any => ({
   headerStyle: {
     backgroundColor:
       themeReducer.theme === 'dark'
         ? darkTheme.PRIMARY_BACKGROUND_COLOR
         : lightTheme.PRIMARY_BACKGROUND_COLOR,
+    shadowColor: 'transparent',
   },
   headerTitleStyle: {
     color:
@@ -17,3 +17,5 @@ export const NewAccountOptions = (themeReducer: any): any => ({
     fontSize: 20,
   },
 });
+
+export default PublichNavigationHeaderStyle;
