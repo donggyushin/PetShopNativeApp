@@ -1,5 +1,3 @@
-import {darkTheme, lightTheme} from '../../styles/theme';
-
 import IntroScreen from '../../screens/public/IntroScreen';
 import {LoggedOutStackParamList} from './PublicOutNavigationType';
 import NewAccountScreen from '../../screens/public/NewAccountScreen';
