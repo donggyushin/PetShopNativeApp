@@ -8,3 +8,6 @@
 3. yarn install && cd ios && pod install 명령어로 앱에 필요한 디펜던시즈를 설치한다. 
 4. yarn ios || yarn android
 
+
+## Contact
+call 010-9041-1019
