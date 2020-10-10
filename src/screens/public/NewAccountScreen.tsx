@@ -2,17 +2,19 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
   TextInput,
   View,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
-import {StyledThemeProps, darkTheme, lightTheme} from '../../styles/theme';
+import React, { useState } from 'react';
+import {StyledThemeProps, darkTheme} from '../../styles/theme';
 
+import Axios from 'axios';
 import Constants from '../../constants/Constants';
 import DismissKeyboard from '../../components/DismissKeyboard';
-import {StoreType} from '../../store';
+import OTPInputView from '@twotalltotems/react-native-otp-input'
+import { PETSHOP_API } from '../../config/configurations';
 import styled from 'styled-components/native';
-import {useSelector} from 'react-redux';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -39,6 +41,7 @@ const PhoneNumberContainer = styled.View`
 const Row = styled.View`
   flex-direction: row;
   align-items: center;
+  justify-content:center;
 `;
 
 const VerificationButton = styled.Button``;
@@ -118,11 +121,46 @@ const NewAccountScreen = () => {
     boolean
   >(false);
 
-  const [verified, setVerified] = useState<boolean>(true);
+  const [verified, setVerified] = useState<boolean>(false);
 
-  const requestVerificationCodeToServer = () => {
+  const requestVerificationCodeToServer = async () => {
     Keyboard.dismiss();
-    console.log('인증 요청 보내기');
+    
+    console.log(`${PETSHOP_API}/api/v1/verification`)
+
+    
+    try{
+
+      const response = await Axios.post(`${PETSHOP_API}/api/v1/verification`, {
+        phoneNumber:phone1 + phone2 + phone3
+      })
+  
+      
+  
+      const status = response.status
+      if (status !== 200) {
+        // TODO: 에러 팝업띄워주기
+        console.log(response.data.message)
+        return 
+      }
+      const {data} = response
+      const {ok} = data as {
+        ok:boolean
+      }
+  
+      if (!ok) {
+        // TODO: 알수 없는 에러 띄워주기
+        return 
+      }
+  
+      // 인증요청 성공
+
+    }catch(err) {
+      console.log('에러발생')
+      console.log(err.message)
+    }
+    
+
   };
 
   const handlePhone1 = (text: string) => {
@@ -171,6 +209,32 @@ const NewAccountScreen = () => {
     }
   };
 
+  const verifyCode = async () => {
+
+    Keyboard.dismiss()
+
+    const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
+    
+    if (response.status !== 200) {
+      // TODO: 에러 팝업띄워주기
+      console.log(response.data.message)
+      return 
+    }
+
+    const {ok} = response.data as {
+      ok:boolean
+    }
+
+    if (!ok) {
+      // TODO: 알수 없는 에러 띄워주기
+      return
+    }
+
+    // 인증성공
+    setVerified(true)
+
+  }
+
   return (
     <DismissKeyboard>
       <KeyboardAvoidingView
@@ -185,7 +249,7 @@ const NewAccountScreen = () => {
                 <PhoneNumber
                   value={phone1}
                   onChangeText={handlePhone1}
-                  width={50}
+                  width={60}
                   placeholder={'010'}
                   maxLength={3}
                 />
@@ -196,7 +260,7 @@ const NewAccountScreen = () => {
                   value={phone2}
                   onChangeText={handlePhone2}
                   ref={(input) => setPhone2Ref(input)}
-                  width={70}
+                  width={60}
                   placeholder={'1234'}
                   maxLength={4}
                 />
@@ -205,7 +269,7 @@ const NewAccountScreen = () => {
               <PhoneNumberContainer>
                 <PhoneNumber
                   ref={(input) => setPhone3Ref(input)}
-                  width={70}
+                  width={60}
                   placeholder={'5678'}
                   maxLength={4}
                   onChangeText={handlePhone3}
@@ -231,18 +295,22 @@ const NewAccountScreen = () => {
                 <VerificationButton
                   title={'인증요청'}
                   onPress={requestVerificationCodeToServer}
-                  disabled={true}
+                  color={darkTheme.PRIMARY_TEXT_COLOR}
+                  
                 />
               </DisabledVerificationButtonContainer>
             )}
           </View>
+          
           <View
             style={{
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
+              width:'100%'
             }}>
-            <VerificationCodeTextInputContainer>
+              
+            {/* <VerificationCodeTextInputContainer>
               <VerificationCodeTextInput
                 onChangeText={handleVerificationCode}
                 maxLength={6}
@@ -250,19 +318,30 @@ const NewAccountScreen = () => {
                 width={230}
                 placeholder={'598273'}
               />
-            </VerificationCodeTextInputContainer>
+            </VerificationCodeTextInputContainer> */}
+            <OTPInputView
+    style={{width: '80%', height: 100}}
+    pinCount={6}
+    // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
+    // onCodeChanged = {code => { this.setState({code})}}
+    autoFocusOnLoad={false}
+    
+    codeInputFieldStyle={styles.underlineStyleBase}
+    codeInputHighlightStyle={styles.underlineStyleHighLighted}
+    onCodeChanged={handleVerificationCode}
+    onCodeFilled = {(code => {
+        console.log(`Code is ${code}, you are good to go!`)
+        handleVerificationCode(code)
+    })}
+/>
             {verificationCodeComplete ? (
               <VerifyButtonContainer
-                style={{
-                  marginTop: 20,
-                }}>
-                <VerifyButton>인증하기</VerifyButton>
+                >
+                <VerifyButton onPress={verifyCode}>인증하기</VerifyButton>
               </VerifyButtonContainer>
             ) : (
               <DisabledVerifyButtonContainer
-                style={{
-                  marginTop: 20,
-                }}>
+                >
                 <VerifyButton>인증하기</VerifyButton>
               </DisabledVerifyButtonContainer>
             )}
@@ -271,7 +350,7 @@ const NewAccountScreen = () => {
             style={{
               flex: 1,
               alignItems: 'center',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
             }}>
             {verified && (
               <NextPageTextContainer>
@@ -279,10 +358,38 @@ const NewAccountScreen = () => {
               </NextPageTextContainer>
             )}
           </View>
+          
         </Container>
       </KeyboardAvoidingView>
     </DismissKeyboard>
   );
 };
+
+const styles = StyleSheet.create({
+  borderStyleBase: {
+    width: 30,
+    height: 45
+  },
+ 
+  borderStyleHighLighted: {
+    borderColor: "#03DAC6",
+  },
+
+  borderStyleHighLightedForLightTheme:{
+    borderColor: "black",
+  },
+ 
+  underlineStyleBase: {
+    width: 30,
+    height: 45,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+  },
+  
+  
+  underlineStyleHighLighted: {
+    borderColor: "#03DAC6",
+  },
+});
 
 export default NewAccountScreen;
