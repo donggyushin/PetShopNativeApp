@@ -62,20 +62,6 @@ const DisabledVerificationButtonContainer = styled.View`
   border-radius: 7px;
 `;
 
-const VerificationCodeTextInput = styled.TextInput.attrs({
-  keyboardType: 'number-pad',
-})<{width: number}>`
-  font-size: ${Constants.fontSize.title};
-  color: ${(props: StyledThemeProps) => props.theme.PRIMARY_TEXT_COLOR};
-  width: ${(props) => props.width + 'px'};
-  text-align: center;
-`;
-
-const VerificationCodeTextInputContainer = styled.View`
-  border-bottom-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_TEXT_COLOR};
-  border-bottom-width: 1px;
-`;
 
 const VerifyButton = styled.Text`
   color: ${darkTheme.PRIMARY_TEXT_COLOR};
@@ -310,15 +296,7 @@ const NewAccountScreen = () => {
               width:'100%'
             }}>
               
-            {/* <VerificationCodeTextInputContainer>
-              <VerificationCodeTextInput
-                onChangeText={handleVerificationCode}
-                maxLength={6}
-                value={verificationCode}
-                width={230}
-                placeholder={'598273'}
-              />
-            </VerificationCodeTextInputContainer> */}
+         
             <OTPInputView
     style={{width: '80%', height: 100}}
     pinCount={6}
