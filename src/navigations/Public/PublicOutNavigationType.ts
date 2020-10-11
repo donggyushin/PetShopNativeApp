@@ -4,6 +4,9 @@ import {StackNavigationProp} from '@react-navigation/stack';
 export type LoggedOutStackParamList = {
   Intro: undefined;
   NewAccount: undefined;
+  NewAccount2: {
+    phoneNumber:string
+  }
 };
 
 type IntroScreenNavigationProp = StackNavigationProp<

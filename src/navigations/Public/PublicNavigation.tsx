@@ -1,5 +1,6 @@
 import IntroScreen from '../../screens/public/IntroScreen';
 import {LoggedOutStackParamList} from './PublicOutNavigationType';
+import NewAccount2Screen from '../../screens/public/NewAccount2Screen';
 import NewAccountScreen from '../../screens/public/NewAccountScreen';
 import PublichNavigationHeaderStyle from './PublicNavigationHeaderStyle';
 import React from 'react';
@@ -26,6 +27,13 @@ const PublicNavigation = () => {
           title: '회원가입',
         }}
         component={NewAccountScreen}
+      />
+      <LoggedOutStack.Screen
+        name={'NewAccount2'}
+        options={{
+          title:'회원가입'
+        }}
+        component={NewAccount2Screen}
       />
     </LoggedOutStack.Navigator>
   );

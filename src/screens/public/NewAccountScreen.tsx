@@ -12,6 +12,7 @@ import {StyledThemeProps, darkTheme} from '../../styles/theme';
 import Axios from 'axios';
 import Constants from '../../constants/Constants';
 import DismissKeyboard from '../../components/DismissKeyboard';
+import { IntroScreenProps } from '../../navigations/Public/PublicOutNavigationType';
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 import { PETSHOP_API } from '../../config/configurations';
 import styled from 'styled-components/native';
@@ -92,7 +93,7 @@ const NextPageText = styled.Text`
 `;
 const NextPageTextContainer = styled.TouchableOpacity``;
 
-const NewAccountScreen = () => {
+const NewAccountScreen = ({route, navigation}:IntroScreenProps) => {
   const [phone1, setPhone1] = useState<string>('');
   const [phone2, setPhone2] = useState<string>('');
   const [phone3, setPhone3] = useState<string>('');
@@ -107,7 +108,7 @@ const NewAccountScreen = () => {
     boolean
   >(false);
 
-  const [verified, setVerified] = useState<boolean>(false);
+  const [verified, setVerified] = useState<boolean>(true);
 
   const requestVerificationCodeToServer = async () => {
     Keyboard.dismiss();
@@ -221,6 +222,12 @@ const NewAccountScreen = () => {
 
   }
 
+  const goToNewAccount2Screen = () => {
+    navigation.navigate('NewAccount2', {
+      phoneNumber:`${phone1}${phone2}${phone3}`
+    })
+  }
+
   return (
     <DismissKeyboard>
       <KeyboardAvoidingView
@@ -331,7 +338,7 @@ const NewAccountScreen = () => {
               justifyContent: 'center',
             }}>
             {verified && (
-              <NextPageTextContainer>
+              <NextPageTextContainer onPress={goToNewAccount2Screen}>
                 <NextPageText>다음 페이지로 가기</NextPageText>
               </NextPageTextContainer>
             )}
