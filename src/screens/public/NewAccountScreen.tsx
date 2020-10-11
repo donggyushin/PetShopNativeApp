@@ -12,7 +12,7 @@ import {StyledThemeProps, darkTheme} from '../../styles/theme';
 import Axios from 'axios';
 import Constants from '../../constants/Constants';
 import DismissKeyboard from '../../components/DismissKeyboard';
-import { IntroScreenProps } from '../../navigations/Public/PublicOutNavigationType';
+import { NewAccountProps } from '../../navigations/Public/PublicOutNavigationType';
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 import { PETSHOP_API } from '../../config/configurations';
 import styled from 'styled-components/native';
@@ -93,7 +93,7 @@ const NextPageText = styled.Text`
 `;
 const NextPageTextContainer = styled.TouchableOpacity``;
 
-const NewAccountScreen = ({route, navigation}:IntroScreenProps) => {
+const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   const [phone1, setPhone1] = useState<string>('');
   const [phone2, setPhone2] = useState<string>('');
   const [phone3, setPhone3] = useState<string>('');

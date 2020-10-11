@@ -1,6 +1,7 @@
 import { StyledThemeProps, darkTheme } from '../../styles/theme';
 
 import Constants from '../../constants/Constants';
+import { NewAccount2Props } from '../../navigations/Public/PublicOutNavigationType';
 import React from 'react'
 import styled from 'styled-components/native';
 
@@ -15,7 +16,7 @@ const VerifyButton = styled.Text`
   font-size: ${Constants.fontSize.text};
 `;
 
-const NewAccount2Screen = () => {
+const NewAccount2Screen = ({route, navigation}:NewAccount2Props) => {
  return (
   <Container>
    <VerifyButton>
