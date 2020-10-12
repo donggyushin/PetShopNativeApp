@@ -1,4 +1,5 @@
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -6,12 +7,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {StyledThemeProps, darkTheme} from '../../styles/theme';
 
 import Axios from 'axios';
 import Constants from '../../constants/Constants';
 import DismissKeyboard from '../../components/DismissKeyboard';
+import { NewAccountProps } from '../../navigations/Public/PublicOutNavigationType';
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 import { PETSHOP_API } from '../../config/configurations';
 import styled from 'styled-components/native';
@@ -92,7 +94,7 @@ const NextPageText = styled.Text`
 `;
 const NextPageTextContainer = styled.TouchableOpacity``;
 
-const NewAccountScreen = () => {
+const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   const [phone1, setPhone1] = useState<string>('');
   const [phone2, setPhone2] = useState<string>('');
   const [phone3, setPhone3] = useState<string>('');
@@ -107,13 +109,23 @@ const NewAccountScreen = () => {
     boolean
   >(false);
 
+  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string>('')
+
   const [verified, setVerified] = useState<boolean>(false);
+
+  const showAlert = (title:string, text:string) => {
+    Alert.alert(title,
+       text, [
+         {
+           text:'확인',
+           
+         }
+       ], {cancelable: false})
+  }
+
 
   const requestVerificationCodeToServer = async () => {
     Keyboard.dismiss();
-    
-    console.log(`${PETSHOP_API}/api/v1/verification`)
-
     
     try{
 
@@ -121,12 +133,11 @@ const NewAccountScreen = () => {
         phoneNumber:phone1 + phone2 + phone3
       })
   
-      
-  
       const status = response.status
       if (status !== 200) {
         // TODO: 에러 팝업띄워주기
-        console.log(response.data.message)
+        
+        showAlert('죄송합니다', response.data.message)
         return 
       }
       const {data} = response
@@ -136,14 +147,15 @@ const NewAccountScreen = () => {
   
       if (!ok) {
         // TODO: 알수 없는 에러 띄워주기
+        showAlert('죄송합니다', '서버 내부에서 알 수 없는 에러가 발생하였습니다')
         return 
       }
   
       // 인증요청 성공
 
     }catch(err) {
-      console.log('에러발생')
-      console.log(err.message)
+      
+      showAlert('죄송합니다', err.response.data.message)
     }
     
 
@@ -198,14 +210,19 @@ const NewAccountScreen = () => {
   const verifyCode = async () => {
 
     Keyboard.dismiss()
-
-    const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
     
+    try{
+      
+      const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
+      
     if (response.status !== 200) {
       // TODO: 에러 팝업띄워주기
-      console.log(response.data.message)
+      
+      showAlert('죄송합니다', response.data.message)
       return 
     }
+
+
 
     const {ok} = response.data as {
       ok:boolean
@@ -213,12 +230,25 @@ const NewAccountScreen = () => {
 
     if (!ok) {
       // TODO: 알수 없는 에러 띄워주기
+      showAlert('죄송합니다', '서버로부터 알 수 없는 에러가 발생하였습니다')
       return
     }
 
     // 인증성공
+    
+    setVerifiedPhoneNumber(response.data.verification.phoneNumber)
     setVerified(true)
+    }catch(err) {
+      
+      showAlert('죄송합니다', err.response.data.message)
+    }
 
+  }
+
+  const goToNewAccount2Screen = () => {
+    navigation.navigate('NewAccount2', {
+      phoneNumber:verifiedPhoneNumber
+    })
   }
 
   return (
@@ -331,7 +361,7 @@ const NewAccountScreen = () => {
               justifyContent: 'center',
             }}>
             {verified && (
-              <NextPageTextContainer>
+              <NextPageTextContainer onPress={goToNewAccount2Screen}>
                 <NextPageText>다음 페이지로 가기</NextPageText>
               </NextPageTextContainer>
             )}
