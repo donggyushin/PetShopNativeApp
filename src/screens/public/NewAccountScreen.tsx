@@ -109,7 +109,9 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
     boolean
   >(false);
 
-  const [verified, setVerified] = useState<boolean>(true);
+  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string>('')
+
+  const [verified, setVerified] = useState<boolean>(false);
 
   const showAlert = (title:string, text:string) => {
     Alert.alert(title,
@@ -153,7 +155,7 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
 
     }catch(err) {
       
-      showAlert('죄송합니다', err.response.message)
+      showAlert('죄송합니다', err.response.data.message)
     }
     
 
@@ -233,6 +235,8 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
     }
 
     // 인증성공
+    
+    setVerifiedPhoneNumber(response.data.verification.phoneNumber)
     setVerified(true)
     }catch(err) {
       
@@ -243,7 +247,7 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
 
   const goToNewAccount2Screen = () => {
     navigation.navigate('NewAccount2', {
-      phoneNumber:`${phone1}${phone2}${phone3}`
+      phoneNumber:verifiedPhoneNumber
     })
   }
 
