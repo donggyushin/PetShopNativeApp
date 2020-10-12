@@ -1,4 +1,5 @@
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -6,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {StyledThemeProps, darkTheme} from '../../styles/theme';
 
 import Axios from 'axios';
@@ -110,11 +111,19 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
 
   const [verified, setVerified] = useState<boolean>(true);
 
+  const showAlert = (title:string, text:string) => {
+    Alert.alert(title,
+       text, [
+         {
+           text:'확인',
+           
+         }
+       ], {cancelable: false})
+  }
+
+
   const requestVerificationCodeToServer = async () => {
     Keyboard.dismiss();
-    
-    console.log(`${PETSHOP_API}/api/v1/verification`)
-
     
     try{
 
@@ -122,12 +131,11 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
         phoneNumber:phone1 + phone2 + phone3
       })
   
-      
-  
       const status = response.status
       if (status !== 200) {
         // TODO: 에러 팝업띄워주기
-        console.log(response.data.message)
+        
+        showAlert('죄송합니다', response.data.message)
         return 
       }
       const {data} = response
@@ -137,14 +145,15 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   
       if (!ok) {
         // TODO: 알수 없는 에러 띄워주기
+        showAlert('죄송합니다', '서버 내부에서 알 수 없는 에러가 발생하였습니다')
         return 
       }
   
       // 인증요청 성공
 
     }catch(err) {
-      console.log('에러발생')
-      console.log(err.message)
+      
+      showAlert('죄송합니다', err.response.message)
     }
     
 
@@ -199,14 +208,19 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   const verifyCode = async () => {
 
     Keyboard.dismiss()
-
-    const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
     
+    try{
+      
+      const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
+      
     if (response.status !== 200) {
       // TODO: 에러 팝업띄워주기
-      console.log(response.data.message)
+      
+      showAlert('죄송합니다', response.data.message)
       return 
     }
+
+
 
     const {ok} = response.data as {
       ok:boolean
@@ -214,11 +228,16 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
 
     if (!ok) {
       // TODO: 알수 없는 에러 띄워주기
+      showAlert('죄송합니다', '서버로부터 알 수 없는 에러가 발생하였습니다')
       return
     }
 
     // 인증성공
     setVerified(true)
+    }catch(err) {
+      
+      showAlert('죄송합니다', err.response.data.message)
+    }
 
   }
 
