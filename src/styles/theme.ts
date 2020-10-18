@@ -5,6 +5,7 @@ export interface DefaultThemeType {
   SECONDARY_TEXT_COLOR: string;
   PRIMARY_BUTTON_COLOR: string;
   SECONDARY_BUTTON_COLOR: string;
+  PRIMARY_RED_COLOR: string;
 }
 
 export const darkTheme: DefaultThemeType = {
@@ -14,6 +15,7 @@ export const darkTheme: DefaultThemeType = {
   SECONDARY_TEXT_COLOR: '#ffffff',
   PRIMARY_BUTTON_COLOR: '#152642',
   SECONDARY_BUTTON_COLOR: '#506680',
+  PRIMARY_RED_COLOR: '#e63946',
 };
 export const lightTheme: DefaultThemeType = {
   mode: 'light',
@@ -22,6 +24,7 @@ export const lightTheme: DefaultThemeType = {
   SECONDARY_TEXT_COLOR: '#333333',
   PRIMARY_BUTTON_COLOR: '#4267B2',
   SECONDARY_BUTTON_COLOR: '#a1c9f1',
+  PRIMARY_RED_COLOR: '#e63946',
 };
 
 export interface StyledThemeProps {

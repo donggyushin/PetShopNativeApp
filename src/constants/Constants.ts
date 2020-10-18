@@ -8,4 +8,5 @@ export default {
     title: '25px',
     text: '18px',
   },
+  idReg: /^[A-za-z]{5,15}/,
 };

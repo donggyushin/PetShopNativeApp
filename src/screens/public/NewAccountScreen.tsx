@@ -1,5 +1,6 @@
 import {
   Alert,
+  Button,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -7,21 +8,20 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import {StyledThemeProps, darkTheme} from '../../styles/theme';
+import React, {useState} from 'react';
 
 import Axios from 'axios';
 import Constants from '../../constants/Constants';
 import DismissKeyboard from '../../components/DismissKeyboard';
-import { NewAccountProps } from '../../navigations/Public/PublicOutNavigationType';
-import OTPInputView from '@twotalltotems/react-native-otp-input'
-import { PETSHOP_API } from '../../config/configurations';
+import {NewAccountProps} from '../../navigations/Public/PublicOutNavigationType';
+import OTPInputView from '@twotalltotems/react-native-otp-input';
+import {PETSHOP_API} from '../../config/configurations';
+import {darkTheme} from '../../styles/theme';
 import styled from 'styled-components/native';
 
 const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BACKGROUND_COLOR};
   align-items: center;
 `;
 
@@ -29,49 +29,44 @@ const PhoneNumber = styled.TextInput.attrs({
   keyboardType: 'number-pad',
 })<{width: number}>`
   font-size: ${Constants.fontSize.title};
-  color: ${(props: StyledThemeProps) => props.theme.PRIMARY_TEXT_COLOR};
+  color: ${(props) => props.theme.PRIMARY_TEXT_COLOR};
   width: ${(props) => props.width + 'px'};
   text-align: center;
 `;
 
 const PhoneNumberContainer = styled.View`
-  border-bottom-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_TEXT_COLOR};
+  border-bottom-color: ${(props) => props.theme.PRIMARY_TEXT_COLOR};
   border-bottom-width: 1px;
 `;
 
 const Row = styled.View`
   flex-direction: row;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
 `;
 
 const VerificationButton = styled.Button``;
 const VerificationButtonContainer = styled.View`
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BUTTON_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BUTTON_COLOR};
   width: 234px;
   height: 40px;
   justify-content: center;
   border-radius: 7px;
 `;
 const DisabledVerificationButtonContainer = styled.View`
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.SECONDARY_BUTTON_COLOR};
+  background-color: ${(props) => props.theme.SECONDARY_BUTTON_COLOR};
   width: 234px;
   height: 40px;
   justify-content: center;
   border-radius: 7px;
 `;
 
-
 const VerifyButton = styled.Text`
   color: ${darkTheme.PRIMARY_TEXT_COLOR};
   font-size: ${Constants.fontSize.text};
 `;
 const VerifyButtonContainer = styled.TouchableOpacity`
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BUTTON_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BUTTON_COLOR};
   width: 234px;
   height: 40px;
   justify-content: center;
@@ -79,8 +74,7 @@ const VerifyButtonContainer = styled.TouchableOpacity`
   align-items: center;
 `;
 const DisabledVerifyButtonContainer = styled.View`
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.SECONDARY_BUTTON_COLOR};
+  background-color: ${(props) => props.theme.SECONDARY_BUTTON_COLOR};
   width: 234px;
   height: 40px;
   justify-content: center;
@@ -88,13 +82,7 @@ const DisabledVerifyButtonContainer = styled.View`
   align-items: center;
 `;
 
-const NextPageText = styled.Text`
-  color: ${(props: StyledThemeProps) => props.theme.PRIMARY_TEXT_COLOR};
-  font-size: ${Constants.fontSize.text};
-`;
-const NextPageTextContainer = styled.TouchableOpacity``;
-
-const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
+const NewAccountScreen = ({navigation}: NewAccountProps) => {
   const [phone1, setPhone1] = useState<string>('');
   const [phone2, setPhone2] = useState<string>('');
   const [phone3, setPhone3] = useState<string>('');
@@ -109,59 +97,67 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
     boolean
   >(false);
 
-  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string>('')
+  const [
+    preventRequestVerificationCode,
+    setPreventRequestVerificationCode,
+  ] = useState(false);
 
-  const [verified, setVerified] = useState<boolean>(false);
-
-  const showAlert = (title:string, text:string) => {
-    Alert.alert(title,
-       text, [
-         {
-           text:'확인',
-           
-         }
-       ], {cancelable: false})
-  }
-
+  const showAlert = (title: string, text: string) => {
+    Alert.alert(
+      title,
+      text,
+      [
+        {
+          text: '확인',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
 
   const requestVerificationCodeToServer = async () => {
     Keyboard.dismiss();
-    
-    try{
 
+    if (!phoneVerified) return;
+
+    if (preventRequestVerificationCode) return;
+
+    setPreventRequestVerificationCode(true);
+
+    try {
       const response = await Axios.post(`${PETSHOP_API}/api/v1/verification`, {
-        phoneNumber:phone1 + phone2 + phone3
-      })
-  
-      const status = response.status
+        phoneNumber: phone1 + phone2 + phone3,
+      });
+
+      const status = response.status;
       if (status !== 200) {
         // TODO: 에러 팝업띄워주기
-        
-        showAlert('죄송합니다', response.data.message)
-        return 
+
+        showAlert('죄송합니다', response.data.message);
+        return;
       }
-      const {data} = response
+      const {data} = response;
       const {ok} = data as {
-        ok:boolean
-      }
-  
+        ok: boolean;
+      };
+
       if (!ok) {
         // TODO: 알수 없는 에러 띄워주기
-        showAlert('죄송합니다', '서버 내부에서 알 수 없는 에러가 발생하였습니다')
-        return 
+        showAlert(
+          '죄송합니다',
+          '서버 내부에서 알 수 없는 에러가 발생하였습니다',
+        );
+        return;
       }
-  
+
       // 인증요청 성공
-
-    }catch(err) {
-      
-      showAlert('죄송합니다', err.response.data.message)
+    } catch (err) {
+      showAlert('죄송합니다', err.response.data.message);
     }
-    
-
   };
 
   const handlePhone1 = (text: string) => {
+    setPreventRequestVerificationCode(false);
     if (text.length <= 3) {
       setPhone1(text);
       checkPhoneVerification(text, phone2, phone3);
@@ -172,6 +168,7 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   };
 
   const handlePhone2 = (text: string) => {
+    setPreventRequestVerificationCode(false);
     if (text.length <= 4) {
       setPhone2(text);
       checkPhoneVerification(phone1, text, phone3);
@@ -182,6 +179,7 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   };
 
   const handlePhone3 = (text: string) => {
+    setPreventRequestVerificationCode(false);
     if (text.length <= 4) {
       setPhone3(text);
       checkPhoneVerification(phone1, phone2, text);
@@ -208,48 +206,43 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
   };
 
   const verifyCode = async () => {
+    Keyboard.dismiss();
 
-    Keyboard.dismiss()
-    
-    try{
-      
-      const response = await Axios.delete(`${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`)
-      
-    if (response.status !== 200) {
-      // TODO: 에러 팝업띄워주기
-      
-      showAlert('죄송합니다', response.data.message)
-      return 
+    try {
+      const response = await Axios.delete(
+        `${PETSHOP_API}/api/v1/verification?phoneNumber=${phone1}${phone2}${phone3}&verificationCode=${verificationCode}`,
+      );
+
+      if (response.status !== 200) {
+        // TODO: 에러 팝업띄워주기
+
+        showAlert('죄송합니다', response.data.message);
+        return;
+      }
+
+      const {ok} = response.data as {
+        ok: boolean;
+      };
+
+      if (!ok) {
+        // TODO: 알수 없는 에러 띄워주기
+        showAlert('죄송합니다', '서버로부터 알 수 없는 에러가 발생하였습니다');
+        return;
+      }
+
+      // 인증성공
+
+      goToNewAccount2Screen(response.data.verification.phoneNumber);
+    } catch (err) {
+      showAlert('죄송합니다', err.response.data.message);
     }
+  };
 
-
-
-    const {ok} = response.data as {
-      ok:boolean
-    }
-
-    if (!ok) {
-      // TODO: 알수 없는 에러 띄워주기
-      showAlert('죄송합니다', '서버로부터 알 수 없는 에러가 발생하였습니다')
-      return
-    }
-
-    // 인증성공
-    
-    setVerifiedPhoneNumber(response.data.verification.phoneNumber)
-    setVerified(true)
-    }catch(err) {
-      
-      showAlert('죄송합니다', err.response.data.message)
-    }
-
-  }
-
-  const goToNewAccount2Screen = () => {
+  const goToNewAccount2Screen = (verifiedPhoneNumber: string) => {
     navigation.navigate('NewAccount2', {
-      phoneNumber:verifiedPhoneNumber
-    })
-  }
+      phoneNumber: verifiedPhoneNumber,
+    });
+  };
 
   return (
     <DismissKeyboard>
@@ -312,44 +305,38 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
                   title={'인증요청'}
                   onPress={requestVerificationCodeToServer}
                   color={darkTheme.PRIMARY_TEXT_COLOR}
-                  
                 />
               </DisabledVerificationButtonContainer>
             )}
           </View>
-          
+
           <View
             style={{
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-              width:'100%'
+              width: '100%',
             }}>
-              
-         
             <OTPInputView
-    style={{width: '80%', height: 100}}
-    pinCount={6}
-    // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
-    // onCodeChanged = {code => { this.setState({code})}}
-    autoFocusOnLoad={false}
-    
-    codeInputFieldStyle={styles.underlineStyleBase}
-    codeInputHighlightStyle={styles.underlineStyleHighLighted}
-    onCodeChanged={handleVerificationCode}
-    onCodeFilled = {(code => {
-        console.log(`Code is ${code}, you are good to go!`)
-        handleVerificationCode(code)
-    })}
-/>
+              style={{width: '80%', height: 100}}
+              pinCount={6}
+              // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
+              // onCodeChanged = {code => { this.setState({code})}}
+              autoFocusOnLoad={false}
+              codeInputFieldStyle={styles.underlineStyleBase}
+              codeInputHighlightStyle={styles.underlineStyleHighLighted}
+              onCodeChanged={handleVerificationCode}
+              onCodeFilled={(code) => {
+                console.log(`Code is ${code}, you are good to go!`);
+                handleVerificationCode(code);
+              }}
+            />
             {verificationCodeComplete ? (
-              <VerifyButtonContainer
-                >
+              <VerifyButtonContainer>
                 <VerifyButton onPress={verifyCode}>인증하기</VerifyButton>
               </VerifyButtonContainer>
             ) : (
-              <DisabledVerifyButtonContainer
-                >
+              <DisabledVerifyButtonContainer>
                 <VerifyButton>인증하기</VerifyButton>
               </DisabledVerifyButtonContainer>
             )}
@@ -359,14 +346,11 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
               flex: 1,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            {verified && (
-              <NextPageTextContainer onPress={goToNewAccount2Screen}>
-                <NextPageText>다음 페이지로 가기</NextPageText>
-              </NextPageTextContainer>
-            )}
-          </View>
-          
+            }}></View>
+          <Button
+            title={'개발용버튼'}
+            onPress={() => goToNewAccount2Screen('01090411019')}
+          />
         </Container>
       </KeyboardAvoidingView>
     </DismissKeyboard>
@@ -376,27 +360,26 @@ const NewAccountScreen = ({route, navigation}:NewAccountProps) => {
 const styles = StyleSheet.create({
   borderStyleBase: {
     width: 30,
-    height: 45
-  },
- 
-  borderStyleHighLighted: {
-    borderColor: "#03DAC6",
+    height: 45,
   },
 
-  borderStyleHighLightedForLightTheme:{
-    borderColor: "black",
+  borderStyleHighLighted: {
+    borderColor: '#03DAC6',
   },
- 
+
+  borderStyleHighLightedForLightTheme: {
+    borderColor: 'black',
+  },
+
   underlineStyleBase: {
     width: 30,
     height: 45,
     borderWidth: 0,
     borderBottomWidth: 1,
   },
-  
-  
+
   underlineStyleHighLighted: {
-    borderColor: "#03DAC6",
+    borderColor: '#03DAC6',
   },
 });
 

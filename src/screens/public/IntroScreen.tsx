@@ -3,7 +3,7 @@ import IntroCarouselComponent, {
   Intro,
 } from '../../components/IntroCarouselComponent';
 import React, {useEffect, useState} from 'react';
-import {StyledThemeProps, darkTheme, lightTheme} from '../../styles/theme';
+import {darkTheme, lightTheme} from '../../styles/theme';
 
 import Constants from '../../constants/Constants';
 import {IntroScreenProps} from '../../navigations/Public/PublicOutNavigationType';
@@ -14,23 +14,20 @@ import {useSelector} from 'react-redux';
 
 const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BACKGROUND_COLOR};
   justify-content: center;
   align-items: center;
 `;
 
 const TopContainer = styled.View`
   flex: 6;
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BACKGROUND_COLOR};
   width: 100%;
   align-items: center;
 `;
 const BottomContainer = styled.View`
   flex: 1;
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BACKGROUND_COLOR};
   width: 100%;
   flex-direction: row;
   justify-content: center;
@@ -38,8 +35,7 @@ const BottomContainer = styled.View`
 `;
 
 const ButtonContainer = styled.View`
-  background-color: ${(props: StyledThemeProps) =>
-    props.theme.PRIMARY_BUTTON_COLOR};
+  background-color: ${(props) => props.theme.PRIMARY_BUTTON_COLOR};
   width: 150px;
   height: 50px;
   justify-content: center;
@@ -152,7 +148,7 @@ const PaginationComponent: React.FunctionComponent<PaginationProps> = ({
   );
 };
 
-const IntroScreen = ({navigation, route}: IntroScreenProps) => {
+const IntroScreen = ({navigation}: IntroScreenProps) => {
   const [entries, setEntries] = useState<Intro[]>([]);
   const [activeSlide, setActiveSlide] = useState<number>(0);
 
