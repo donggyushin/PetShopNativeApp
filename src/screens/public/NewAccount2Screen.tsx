@@ -57,7 +57,6 @@ const NewAccount2Screen = ({route, navigation}: NewAccount2Props) => {
     const idReg = Constants.idReg;
 
     setId(text);
-    console.log(text);
     setValidId(idReg.test(text).valueOf());
   };
 
