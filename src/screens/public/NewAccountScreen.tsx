@@ -256,6 +256,7 @@ const NewAccountScreen = ({navigation}: NewAccountProps) => {
             <Row>
               <PhoneNumberContainer>
                 <PhoneNumber
+                  autoFocus={true}
                   value={phone1}
                   onChangeText={handlePhone1}
                   width={60}
